@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Gestão de Atividades - Jacson Silva de Jesus</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: #f0f4f8;
+            color: #1a2c3e;
+            padding: 2rem 1.5rem;
+            line-height: 1.4;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* cabeçalho */
+        .header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #1e6f3f, #2b8c5e);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.3px;
+        }
+
+        .header p {
+            color: #4a627a;
+            margin-top: 0.5rem;
+            font-weight: 500;
+            border-bottom: 2px solid #cbdde6;
+            display: inline-block;
+            padding-bottom: 6px;
+        }
+
+        /* cards de estatística / resumo */
+        .stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.2rem;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 28px;
+            padding: 0.9rem 1.8rem;
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.02), 0 2px 4px rgba(0, 0, 0, 0.05);
+            flex: 1;
+            min-width: 130px;
+            text-align: center;
+            border: 1px solid #e2edf2;
+            transition: all 0.2s;
+        }
+
+        .stat-card span {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #1f6e43;
+            display: block;
+        }
+
+        .stat-card label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            font-weight: 600;
+            color: #5a6e82;
+            letter-spacing: 0.5px;
+        }
+
+        /* filtros e busca */
+        .filters {
+            background: white;
+            border-radius: 28px;
+            padding: 1.2rem 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.03);
+            border: 1px solid #e4edf2;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: flex-end;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .filter-group label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.75rem;
+            margin-bottom: 6px;
+            color: #2c5a74;
+            letter-spacing: 0.3px;
+        }
+
+        .filter-group input, .filter-group select {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 60px;
+            border: 1px solid #cbdbe0;
+            background: #fefefe;
+            font-size: 0.9rem;
+            transition: 0.2s;
+            font-family: inherit;
+        }
+
+        .filter-group input:focus, .filter-group select:focus {
+            outline: none;
+            border-color: #2b8c5e;
+            box-shadow: 0 0 0 2px rgba(43, 140, 94, 0.2);
+        }
+
+        .reset-btn {
+            background: #eef2f6;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 40px;
+            font-weight: 600;
+            color: #2c5a74;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.85rem;
+        }
+
+        .reset-btn:hover {
+            background: #e0e8ef;
+            transform: scale(0.97);
+        }
+
+        /* tabela responsiva */
+        .table-wrapper {
+            background: white;
+            border-radius: 28px;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.05);
+            overflow-x: auto;
+            border: 1px solid #e9f0f4;
+        }
+
+        .activity-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            min-width: 760px;
+        }
+
+        .activity-table th {
+            text-align: left;
+            padding: 1rem 1rem;
+            background: #f8fbfd;
+            color: #1a4b6e;
+            font-weight: 700;
+            border-bottom: 2px solid #dde6ed;
+            font-size: 0.85rem;
+        }
+
+        .activity-table td {
+            padding: 1rem 1rem;
+            border-bottom: 1px solid #eef3f8;
+            vertical-align: top;
+            color: #1f2f3e;
+        }
+
+        .activity-table tr:hover td {
+            background-color: #fafef7;
+        }
+
+        .material-name {
+            font-weight: 600;
+            color: #0a4b2c;
+        }
+
+        .link-cell a {
+            text-decoration: none;
+            color: #1f77b4;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #eef5fc;
+            padding: 5px 12px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            transition: 0.2s;
+        }
+
+        .link-cell a:hover {
+            background: #d9eaf5;
+            color: #0c5b8a;
+        }
+
+        .no-link {
+            color: #8ea0ad;
+            font-style: italic;
+            font-size: 0.75rem;
+            background: #f5f7f9;
+            padding: 4px 10px;
+            border-radius: 30px;
+            display: inline-block;
+        }
+
+        .badge-date {
+            font-family: monospace;
+            font-weight: 600;
+            background: #eaf5ea;
+            padding: 4px 8px;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            display: inline-block;
+            color: #226644;
+        }
+
+        .empty-row td {
+            text-align: center;
+            padding: 3rem;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+
+        footer {
+            margin-top: 2rem;
+            text-align: center;
+            font-size: 0.7rem;
+            color: #8aa0b0;
+            border-top: 1px solid #d9e2ea;
+            padding-top: 1.5rem;
+        }
+
+        @media (max-width: 680px) {
+            body {
+                padding: 1rem;
+            }
+            .stat-card span {
+                font-size: 1.5rem;
+            }
+            .filter-group {
+                min-width: 100%;
+            }
+            .reset-btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>📋 Linha do tempo | Atividades e Publicações</h1>
+        <p>Prefeitura de Pimenta Bueno - RO | Acompanhamento de ações, matérias e comunicados oficiais</p>
+    </div>
+
+    <div class="stats" id="statsContainer">
+        <!-- estatísticas dinâmicas via JS -->
+    </div>
+
+    <div class="filters">
+        <div class="filter-group">
+            <label>📅 Data inicial</label>
+            <input type="date" id="filterStartDate">
+        </div>
+        <div class="filter-group">
+            <label>📅 Data final</label>
+            <input type="date" id="filterEndDate">
+        </div>
+        <div class="filter-group">
+            <label>🔍 Buscar por material / título</label>
+            <input type="text" id="searchText" placeholder="Ex: SEMMA, Cidade Limpa, IPTU...">
+        </div>
+        <div class="filter-group">
+            <label>🔗 Tipo de conteúdo</label>
+            <select id="linkTypeFilter">
+                <option value="all">Todos (com/sem link)</option>
+                <option value="with_link">Apenas com link externo</option>
+                <option value="without_link">Apenas sem link (eventos, painel, gravação)</option>
+            </select>
+        </div>
+        <button class="reset-btn" id="resetFiltersBtn">⟳ Limpar filtros</button>
+    </div>
+
+    <div class="table-wrapper">
+        <table class="activity-table" id="activityTable">
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Material / Atividade</th>
+                    <th>Link / Referência</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <!-- preenchido via JS -->
+            </tbody>
+        </table>
+    </div>
+    <footer>
+        ✅ Dados atualizados mês a mês
+    </footer>
+</div>
+
+<script>
+    // ---------- DADOS OBTIDOS DA PLANILHA (conforme fornecido) ----------
+    const rawData = [
+        { date: "2026-03-02", material: "Matéria sobre a Recuperação de APPs", link: "http://pimentabueno.ro.gov.br/noticiasView/2760_SEMMA-realiza-acao-de-recuperacao-de-APP-em-parceria-com-clubes-de-desbravadores.html" },
+        { date: "2026-03-03", material: "Matéria sobre a Operação Cidade Limpa", link: "http://pimentabueno.ro.gov.br/noticiasView/2761_Projeto-Cidade-Limpa-atende-novos-bairros-com-coleta-de-residuos.html" },
+        { date: "2026-03-05", material: "Decoração do Painel do Dia das Mulheres", link: "" },
+        { date: "2026-03-07", material: "Matéria Cidade Limpa - população aderiu", link: "http://pimentabueno.ro.gov.br/noticiasView/2764_Populacao-adere-ao-Projeto-Cidade-Limpa-e-colabora-com-a-coleta-de-residuos.html" },
+        { date: "2026-03-07", material: "Matéria Obras nas Estradas Vicinais", link: "http://pimentabueno.ro.gov.br/noticiasView/2763_SEMOSP-intensifica-manutencao-de-estradas-rurais-para-garantir-acesso-durante-periodo-chuvoso.html" },
+        { date: "2026-03-09", material: "Matéria Chamada Pública - Garra", link: "http://pimentabueno.ro.gov.br/noticiasView/2767_Prefeitura-abre-chamada-publica-para-o-Programa-GARRA.html" },
+        { date: "2026-03-09", material: "Matéria Encerramento Residentes 2022", link: "http://pimentabueno.ro.gov.br/noticiasView/2765_Prefeitura-realiza-cerimonia-de-encerramento-da-primeira-turma-de-Residencia-em-Saude-da-Familia.html" },
+        { date: "2026-03-09", material: "Matéria Novos Residentes 2026", link: "http://pimentabueno.ro.gov.br/noticiasView/2766_Pimenta-Bueno-realiza-recepcao-e-semana-de-integracao-para-novos-residentes-da-area-da-saude.html" },
+        { date: "2026-03-10", material: "Post Atendimentos das UBS's", link: "https://www.instagram.com/p/DVteQcIFW1C/?img_index=1" },
+        { date: "2026-03-11", material: "Matéria PPI (Programa de Pagamento Incentivado)", link: "http://pimentabueno.ro.gov.br/noticiasView/2768_Prefeitura-prorroga-prazo-do-Programa-de-Pagamento-Incentivado-(PPI)-ate-26-de-maio.html" },
+        { date: "2026-03-11", material: "Finalizado o Programa para a TV do Gabinete - Tela Digital", link: "https://digital-xi-pied.vercel.app/" },
+        { date: "2026-03-12", material: "Matéria Concurso Declare Seu Amor", link: "http://pimentabueno.ro.gov.br/noticiasView/2771_Pimenta-Bueno-lanca-I-Concurso-%E2%80%9CDeclare-Seu-Amor%E2%80%9D-para-incentivar-destinacao-do-Imposto-de-Renda-ao-FUNDICRA.html" },
+        { date: "2026-03-12", material: "Matéria SEMMA Arborização", link: "http://pimentabueno.ro.gov.br/noticiasView/2770_Alunos-participam-de-atividade-sobre-arborizacao-urbana-com-equipe-da-SEMMA.html" },
+        { date: "2026-03-12", material: "Matéria Justiça Rápida Itinerante", link: "http://pimentabueno.ro.gov.br/noticiasView/2769_Secretaria-de-Saude-e-Assistencia-Social-participam-da-acao-Justica-Rapida-Itinerante-em-Pimenta-Bueno.html" },
+        { date: "2026-03-13", material: "Matéria Informações Teste Seletivo", link: "http://pimentabueno.ro.gov.br/noticiasView/2772_Prefeitura-divulga-errata-e-altera-cronograma-do-Teste-Seletivo-Simplificado-no-01/2026-da-Saude.html" },
+        { date: "2026-03-17", material: "Matéria Reunião SEMMA e Defesa Civil", link: "http://pimentabueno.ro.gov.br/noticiasView/2773_Municipio-reforca-acoes-de-prevencao-e-combate-a-queimadas-diante-de-alerta-climatico-para-2026.html" },
+        { date: "2026-03-17", material: "Post Atendimentos das UBS's", link: "https://www.instagram.com/p/DV_MJB4DcG6/?img_index=1" },
+        { date: "2026-03-19", material: "Matéria SEMMA Garrafas PET", link: "http://pimentabueno.ro.gov.br/noticiasView/2774_SEMMA-promove-troca-de-garrafas-PET-por-mudas-e-incentiva-preservacao-ambiental.html" },
+        { date: "2026-03-19", material: "Matéria Chamada Pública - Agricultura Familiar", link: "http://pimentabueno.ro.gov.br/noticiasView/2775_Prefeitura-abre-chamada-publica-para-aquisicao-de-alimentos-da-agricultura-familiar.html" },
+        { date: "2026-03-23", material: "Matéria SEMMA - PitStop Conscientização dia da Água", link: "http://pimentabueno.ro.gov.br/noticiasView/2776_Pit-stop-promove-conscientizacao-sobre-uso-da-agua-em-Pimenta-Bueno.html" },
+        { date: "2026-03-23", material: "Matéria SEMMA e SEDAM - 10.000 mudas", link: "http://pimentabueno.ro.gov.br/noticiasView/2777_SEMMA-recebe-mais-de-10-mil-mudas-em-parceria-com-a-SEDAM.html" },
+        { date: "2026-03-24", material: "Post Atendimentos das UBS's", link: "https://www.instagram.com/p/DWRKWalFXBl/?img_index=1" },
+        { date: "2026-03-24", material: "Alteração popup IPTU site", link: "https://drive.google.com/file/d/1wCjgYV8SIOAye-DUNt4q_5yHyTj4HOE5/view?usp=sharing" },
+        { date: "2026-03-24", material: "Gravação como solicitar IPTU no site", link: "https://www.instagram.com/p/DWWM9mcgGyW/" },
+        { date: "2026-03-25", material: "Matéria Selo Ouro - Sala do Empreendedor", link: "http://pimentabueno.ro.gov.br/noticiasView/2779_Pimenta-Bueno-participa-do-Dialogos-Municipalistas-e-conquista-destaque-estadual-em-premiacao-do-Sebrae.html" },
+        { date: "2026-03-25", material: "Matéria Selo Ouro - Alfabetização", link: "http://pimentabueno.ro.gov.br/noticiasView/2778_Pimenta-Bueno-conquista-Selo-Ouro-Nacional-de-Alfabetizacao-pelo-segundo-ano-consecutivo.html" },
+        { date: "2026-03-26", material: "Matéria Reunião Gestores Escolares - Selo Ouro", link: "http://pimentabueno.ro.gov.br/noticiasView/2780_SEMED-reune-gestores-escolares-e-celebra-conquista-do-Selo-Ouro-Nacional-de-Alfabetizacao.html" },
+        { date: "2026-03-26", material: "Matéria Formação Integrada SEMED", link: "http://pimentabueno.ro.gov.br/noticiasView/2781_SEMED-realiza-1%C2%AA-Formacao-Integrada-para-fortalecimento-da-aprendizagem-nos-anos-iniciais.html" },
+        { date: "2026-03-27", material: "Matéria Comunicado SEMMA", link: "http://pimentabueno.ro.gov.br/noticiasView/2782_COMUNICADO-%E2%80%93-SECRETARIA-MUNICIPAL-DE-MEIO-AMBIENTE.html" },
+        { date: "2026-03-31", material: "Matéria Lançamento Vale Feira", link: "http://pimentabueno.ro.gov.br/noticiasView/2783_Prefeitura-de-Pimenta-Bueno-realiza-lancamento-do-Cartao-Vale-Feira-para-servidores-municipais.html" },
+        { date: "2026-03-31", material: "Matéria Capacitação Feirantes - Vale Feira", link: "http://pimentabueno.ro.gov.br/noticiasView/2784_Prefeitura-realiza-capacitacao-para-feirantes-sobre-uso-do-Cartao-Sim-Vale-Feira.html" }
+    ];
+
+    // função para formatar data amigável (dd/mm/aaaa)
+    function formatDate(dateStr) {
+        if (!dateStr) return '';
+        const [year, month, day] = dateStr.split('-');
+        return `${day}/${month}/${year}`;
+    }
+
+    // Função para ordenar os dados por data (crescente)
+    function sortDataByDate(dataArray) {
+        return [...dataArray].sort((a, b) => new Date(a.date) - new Date(b.date));
+    }
+
+    let currentData = sortDataByDate(rawData);
+
+    // DOM elements
+    const tbody = document.getElementById('tableBody');
+    const filterStart = document.getElementById('filterStartDate');
+    const filterEnd = document.getElementById('filterEndDate');
+    const searchText = document.getElementById('searchText');
+    const linkTypeFilter = document.getElementById('linkTypeFilter');
+    const resetBtn = document.getElementById('resetFiltersBtn');
+    const statsContainer = document.getElementById('statsContainer');
+
+    // Aplica todos os filtros
+    function applyFilters() {
+        let filtered = [...currentData];
+
+        // filtro de data início
+        if (filterStart.value) {
+            const start = new Date(filterStart.value);
+            filtered = filtered.filter(item => new Date(item.date) >= start);
+        }
+        // data fim
+        if (filterEnd.value) {
+            const end = new Date(filterEnd.value);
+            filtered = filtered.filter(item => new Date(item.date) <= end);
+        }
+        // busca textual (material)
+        if (searchText.value.trim() !== '') {
+            const query = searchText.value.trim().toLowerCase();
+            filtered = filtered.filter(item => item.material.toLowerCase().includes(query));
+        }
+        // filtro tipo de link
+        const linkType = linkTypeFilter.value;
+        if (linkType === 'with_link') {
+            filtered = filtered.filter(item => item.link && item.link.trim() !== '');
+        } else if (linkType === 'without_link') {
+            filtered = filtered.filter(item => !item.link || item.link.trim() === '');
+        }
+
+        renderTable(filtered);
+        updateStats(filtered);
+    }
+
+    // renderizar tabela
+    function renderTable(dataToRender) {
+        if (!tbody) return;
+        if (dataToRender.length === 0) {
+            tbody.innerHTML = `<tr class="empty-row"><td colspan="3">📭 Nenhuma atividade encontrada com os filtros selecionados. Tente outros termos ou datas.</td></tr>`;
+            return;
+        }
+
+        let html = '';
+        for (let item of dataToRender) {
+            const formattedDate = formatDate(item.date);
+            const hasLink = item.link && item.link.trim() !== '';
+            let linkHtml = '';
+            if (hasLink) {
+                // abre em nova aba
+                linkHtml = `<a href="${item.link}" target="_blank" rel="noopener noreferrer">🔗 Acessar conteúdo ↗</a>`;
+            } else {
+                linkHtml = `<span class="no-link">📌 Sem link externo (evento interno / painel)</span>`;
+            }
+
+            html += `
+                <tr>
+                    <td style="white-space: nowrap;"><span class="badge-date">${formattedDate}</span></td>
+                    <td class="material-name">${escapeHtml(item.material)}</td>
+                    <td class="link-cell">${linkHtml}</td>
+                </tr>
+            `;
+        }
+        tbody.innerHTML = html;
+    }
+
+    // pequena função para evitar XSS (por segurança)
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+            return c;
+        });
+    }
+
+    // atualiza cards de estatística
+    function updateStats(filteredData) {
+        const totalAtividades = filteredData.length;
+        const totalComLink = filteredData.filter(item => item.link && item.link.trim() !== '').length;
+        const totalSemLink = totalAtividades - totalComLink;
+
+        // dias distintos com atividades
+        const uniqueDays = new Set(filteredData.map(item => item.date)).size;
+
+        statsContainer.innerHTML = `
+            <div class="stat-card"><span>${totalAtividades}</span><label>Atividades no período</label></div>
+            <div class="stat-card"><span>${totalComLink}</span><label>Com link oficial</label></div>
+            <div class="stat-card"><span>${totalSemLink}</span><label>Eventos / internos</label></div>
+            <div class="stat-card"><span>${uniqueDays}</span><label>Dias com registros</label></div>
+        `;
+    }
+
+    // resetar todos os filtros
+    function resetFilters() {
+        filterStart.value = '';
+        filterEnd.value = '';
+        searchText.value = '';
+        linkTypeFilter.value = 'all';
+        applyFilters();  // reaplica com dados originais (já ordenados)
+    }
+
+    // listener eventos
+    filterStart.addEventListener('change', applyFilters);
+    filterEnd.addEventListener('change', applyFilters);
+    searchText.addEventListener('input', applyFilters);
+    linkTypeFilter.addEventListener('change', applyFilters);
+    resetBtn.addEventListener('click', resetFilters);
+
+    // inicialização
+    function init() {
+        // assegurar ordenação original
+        currentData = sortDataByDate(rawData);
+        renderTable(currentData);
+        updateStats(currentData);
+        // definir valores padrão dos campos de data como vazio (mostrar tudo)
+        // não há necessidade de setar valor prévio
+    }
+
+    init();
+</script>
+</body>
+</html>
