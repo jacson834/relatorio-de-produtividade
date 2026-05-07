@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Gestão de Atividades - Jacson Silva de Jesus</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-
         * {
             margin: 0;
             padding: 0;
@@ -61,6 +59,37 @@
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 1.5rem;
             margin-bottom: 2.5rem;
+        }
+
+        .month-tabs {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .month-tab {
+            border: 1px solid #cbd5e1;
+            background: #ffffff;
+            color: #334155;
+            padding: 0.55rem 1rem;
+            border-radius: 999px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .month-tab:hover {
+            border-color: #94a3b8;
+            color: #0f172a;
+        }
+
+        .month-tab.active {
+            background: #059669;
+            border-color: #059669;
+            color: #ffffff;
         }
 
         .stat-card {
@@ -183,6 +212,15 @@
             background: #1e293b;
         }
 
+        .reset-btn:focus-visible,
+        .export-btn:focus-visible,
+        .month-tab:focus-visible,
+        .link-cell a:focus-visible,
+        .back-to-top:focus-visible {
+            outline: 3px solid rgba(16, 185, 129, 0.35);
+            outline-offset: 2px;
+        }
+
         /* Tabela responsiva */
         .table-wrapper {
             background: #ffffff;
@@ -254,6 +292,7 @@
             font-size: 0.875rem;
             transition: all 0.2s ease;
             border: 1px solid #d1fae5;
+            word-break: break-word;
         }
 
         .link-cell a:hover {
@@ -355,6 +394,9 @@
             }
         }
     </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <!-- Bibliotecas para exportar PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -367,25 +409,31 @@
         <p>Acompanhamento de ações, matérias e comunicados oficiais</p>
     </div>
 
+    <div class="month-tabs" id="monthTabs">
+        <button class="month-tab" type="button" data-month="2026-03">Março</button>
+        <button class="month-tab active" type="button" data-month="2026-04">Abril</button>
+        <button class="month-tab" type="button" data-month="all">Todos</button>
+    </div>
+
     <div class="stats" id="statsContainer">
         <!-- estatísticas dinâmicas via JS -->
     </div>
 
     <div class="filters">
         <div class="filter-group">
-            <label><i data-lucide="calendar"></i> Data inicial</label>
+            <label for="filterStartDate"><i data-lucide="calendar"></i> Data inicial</label>
             <input type="date" id="filterStartDate">
         </div>
         <div class="filter-group">
-            <label><i data-lucide="calendar"></i> Data final</label>
+            <label for="filterEndDate"><i data-lucide="calendar"></i> Data final</label>
             <input type="date" id="filterEndDate">
         </div>
         <div class="filter-group">
-            <label><i data-lucide="search"></i> Buscar por material / título</label>
+            <label for="searchText"><i data-lucide="search"></i> Buscar por material / título</label>
             <input type="text" id="searchText" placeholder="Ex: SEMMA, Cidade Limpa, IPTU...">
         </div>
         <div class="filter-group">
-            <label><i data-lucide="link"></i> Tipo de conteúdo</label>
+            <label for="linkTypeFilter"><i data-lucide="link"></i> Tipo de conteúdo</label>
             <select id="linkTypeFilter">
                 <option value="all">Todos (com/sem link)</option>
                 <option value="with_link">Apenas com link externo</option>
@@ -454,22 +502,56 @@
         { date: "2026-03-26", material: "Matéria Formação Integrada SEMED", link: "http://pimentabueno.ro.gov.br/noticiasView/2781_SEMED-realiza-1%C2%AA-Formacao-Integrada-para-fortalecimento-da-aprendizagem-nos-anos-iniciais.html" },
         { date: "2026-03-27", material: "Matéria Comunicado SEMMA", link: "http://pimentabueno.ro.gov.br/noticiasView/2782_COMUNICADO-%E2%80%93-SECRETARIA-MUNICIPAL-DE-MEIO-AMBIENTE.html" },
         { date: "2026-03-31", material: "Matéria Lançamento Vale Feira", link: "http://pimentabueno.ro.gov.br/noticiasView/2783_Prefeitura-de-Pimenta-Bueno-realiza-lancamento-do-Cartao-Vale-Feira-para-servidores-municipais.html" },
-        { date: "2026-03-31", material: "Matéria Capacitação Feirantes - Vale Feira", link: "http://pimentabueno.ro.gov.br/noticiasView/2784_Prefeitura-realiza-capacitacao-para-feirantes-sobre-uso-do-Cartao-Sim-Vale-Feira.html" }
+        { date: "2026-03-31", material: "Matéria Capacitação Feirantes - Vale Feira", link: "http://pimentabueno.ro.gov.br/noticiasView/2784_Prefeitura-realiza-capacitacao-para-feirantes-sobre-uso-do-Cartao-Sim-Vale-Feira.html" },
+        { date: "2026-04-01", material: "Post Números UBSs", link: "https://www.instagram.com/p/DWl6EQyleZQ/?img_index=1" },
+        { date: "2026-04-01", material: "Post Feriado Paixão de Cristo", link: "https://www.instagram.com/p/DWlvc6iFam5/" },
+        { date: "2026-04-02", material: "Post Abril Azul - Autismo", link: "https://www.instagram.com/p/DWoQwIqACZs/" },
+        { date: "2026-04-04", material: "Cobertura Páscoa SEMAST", link: "https://www.pimentabueno.ro.gov.br/galeria/?id=101" },
+        { date: "2026-04-04", material: "Cobertura Entrega de Peixes SEMAST", link: "https://www.pimentabueno.ro.gov.br/galeria/?id=100" },
+        { date: "2026-04-05", material: "Cobertura Ovos de Páscoa Autarquia", link: "" },
+        { date: "2026-04-07", material: "Matéria Homenagem Seu Adão", link: "https://pimentabueno.ro.gov.br/noticiasView/2787_Prefeitura-homenageia-Seu-Adao-por-dedicacao-ao-servico-publico.html" },
+        { date: "2026-04-09", material: "Post Convite Abertura JEP'S", link: "https://www.instagram.com/p/DW6UGBZjUt7/" },
+        { date: "2026-04-09", material: "Post Números UBSs", link: "https://www.instagram.com/p/DW6Rmj2jfmc/?img_index=1" },
+        { date: "2026-04-14", material: "Post Vagas de Estágio", link: "https://www.instagram.com/p/DXIAzELFTZV/?img_index=1" },
+        { date: "2026-04-14", material: "Post Números UBSs", link: "https://www.instagram.com/p/DXHJVXSlZqB/?img_index=1" },
+        { date: "2026-04-17", material: "Post Leilão de Máquinas", link: "https://www.instagram.com/p/DXPmiudlfKb/" },
+        { date: "2026-04-17", material: "Post Palestra do Autismo", link: "https://www.instagram.com/p/DXPbD-JlYDg/" },
+        { date: "2026-04-17", material: "Post Feriado Tiradentes", link: "https://www.instagram.com/p/DXO25ooAAdB/" },
+        { date: "2026-04-20", material: "Arte Maio Amarelo", link: "https://www.instagram.com/p/DX6kqF7lQZx/" },
+        { date: "2026-04-23", material: "Post Abril Verde - Segurança do Trabalho", link: "https://www.instagram.com/p/DXer0uAlcnV/" },
+        { date: "2026-04-23", material: "Post Números UBSs", link: "https://www.instagram.com/p/DXerOWcFduq/?img_index=1" },
+        { date: "2026-04-26", material: "Cobertura Corrida de Tiradentes", link: "https://www.pimentabueno.ro.gov.br/galeria/?id=107" },
+        { date: "2026-04-26", material: "Cobertura Ciclismo Estadual", link: "https://www.pimentabueno.ro.gov.br/galeria/?id=102" },
+        { date: "2026-04-29", material: "Criação Arte Maio Amarelo", link: "https://www.instagram.com/p/DX-F5Kzlepl/" },
+        { date: "2026-04-29", material: "Cobertura Palestra Autismo", link: "https://www.pimentabueno.ro.gov.br/galeria/?id=108" },
+        { date: "2026-04-30", material: "Post Feriado Nacional", link: "https://www.instagram.com/p/DXwZj0VlRTr/" },
+        { date: "2026-04-30", material: "Transmissão interna Abertura do JEP'S", link: "" },
+        { date: "2026-04-30", material: "Matéria Prazo de Regularização Título de Eleitor", link: "https://www.instagram.com/p/DXuJImbFb6u/?img_index=1" },
+        { date: "2026-04-30", material: "Post Números UBSs", link: "https://www.instagram.com/p/DXuGI_RlVgG/?img_index=1" }
     ];
 
     // função para formatar data amigável (dd/mm/aaaa)
     function formatDate(dateStr) {
         if (!dateStr) return '';
-        const [year, month, day] = dateStr.split('-');
-        const dateObj = new Date(year, month - 1, day);
+        const dateObj = parseIsoDateLocal(dateStr);
+        if (!dateObj) return dateStr;
+        const day = String(dateObj.getDate()).padStart(2, '0');
+        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const year = dateObj.getFullYear();
         const weekDays = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
         const weekDay = weekDays[dateObj.getDay()];
         return `${day}/${month}/${year} (${weekDay})`;
     }
 
+    function parseIsoDateLocal(dateStr) {
+        if (!dateStr || !/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return null;
+        const [year, month, day] = dateStr.split('-').map(Number);
+        return new Date(year, month - 1, day);
+    }
+
     // Função para ordenar os dados por data (crescente)
     function sortDataByDate(dataArray) {
-        return [...dataArray].sort((a, b) => new Date(a.date) - new Date(b.date));
+        return [...dataArray].sort((a, b) => parseIsoDateLocal(a.date) - parseIsoDateLocal(b.date));
     }
 
     let currentData = sortDataByDate(rawData);
@@ -484,25 +566,37 @@
     const resetBtn = document.getElementById('resetFiltersBtn');
     const exportPdfBtn = document.getElementById('exportPdfBtn');
     const statsContainer = document.getElementById('statsContainer');
+    const monthTabsContainer = document.getElementById('monthTabs');
+    const monthTabs = monthTabsContainer ? monthTabsContainer.querySelectorAll('.month-tab') : [];
+
+    let activeMonth = '2026-04';
 
     // Aplica todos os filtros
     function applyFilters() {
         let filtered = [...currentData];
 
+        if (activeMonth !== 'all') {
+            filtered = filtered.filter(item => item.date && item.date.startsWith(activeMonth));
+        }
+
         // filtro de data início
         if (filterStart.value) {
-            const start = new Date(filterStart.value);
-            filtered = filtered.filter(item => new Date(item.date) >= start);
+            const start = parseIsoDateLocal(filterStart.value);
+            filtered = filtered.filter(item => parseIsoDateLocal(item.date) >= start);
         }
         // data fim
         if (filterEnd.value) {
-            const end = new Date(filterEnd.value);
-            filtered = filtered.filter(item => new Date(item.date) <= end);
+            const end = parseIsoDateLocal(filterEnd.value);
+            filtered = filtered.filter(item => parseIsoDateLocal(item.date) <= end);
         }
         // busca textual (material)
         if (searchText.value.trim() !== '') {
             const query = searchText.value.trim().toLowerCase();
-            filtered = filtered.filter(item => item.material.toLowerCase().includes(query));
+            filtered = filtered.filter(item => {
+                const materialText = (item.material || '').toLowerCase();
+                const linkText = (item.link || '').toLowerCase();
+                return materialText.includes(query) || linkText.includes(query);
+            });
         }
         // filtro tipo de link
         const linkType = linkTypeFilter.value;
@@ -529,11 +623,12 @@
         let html = '';
         for (let item of dataToRender) {
             const formattedDate = formatDate(item.date);
-            const hasLink = item.link && item.link.trim() !== '';
+            const safeLink = sanitizeUrl(item.link);
+            const hasLink = safeLink !== '';
             let linkHtml = '';
             if (hasLink) {
                 // abre em nova aba
-                linkHtml = `<a href="${item.link}" target="_blank" rel="noopener noreferrer"><i data-lucide="external-link"></i> Acessar conteúdo</a>`;
+                linkHtml = `<a href="${safeLink}" target="_blank" rel="noopener noreferrer"><i data-lucide="external-link"></i> Acessar conteúdo</a>`;
             } else {
                 linkHtml = `<span class="no-link"><i data-lucide="pin"></i> Sem link externo (evento interno / painel)</span>`;
             }
@@ -563,6 +658,21 @@
         });
     }
 
+    function sanitizeUrl(url) {
+        if (!url || typeof url !== 'string') return '';
+        const trimmedUrl = url.trim();
+        if (!trimmedUrl) return '';
+        try {
+            const parsed = new URL(trimmedUrl);
+            if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+                return parsed.href;
+            }
+            return '';
+        } catch (err) {
+            return '';
+        }
+    }
+
     // atualiza cards de estatística
     function updateStats(filteredData) {
         const totalAtividades = filteredData.length;
@@ -589,12 +699,25 @@
         applyFilters();  // reaplica com dados originais (já ordenados)
     }
 
+    function setActiveMonth(monthValue) {
+        activeMonth = monthValue;
+        for (let tab of monthTabs) {
+            tab.classList.toggle('active', tab.dataset.month === monthValue);
+        }
+        applyFilters();
+    }
+
     // listener eventos
     filterStart.addEventListener('change', applyFilters);
     filterEnd.addEventListener('change', applyFilters);
     searchText.addEventListener('input', applyFilters);
     linkTypeFilter.addEventListener('change', applyFilters);
     resetBtn.addEventListener('click', resetFilters);
+    if (monthTabs.length > 0) {
+        for (let tab of monthTabs) {
+            tab.addEventListener('click', () => setActiveMonth(tab.dataset.month));
+        }
+    }
 
     // Lógica do botão Voltar ao Topo
     const backToTopBtn = document.getElementById('backToTopBtn');
@@ -657,9 +780,7 @@
     function init() {
         // assegurar ordenação original
         currentData = sortDataByDate(rawData);
-        currentFilteredData = currentData; // Inicia com todos os dados
-        renderTable(currentData);
-        updateStats(currentData);
+        setActiveMonth('2026-04');
         // definir valores padrão dos campos de data como vazio (mostrar tudo)
         // não há necessidade de setar valor prévio
     }
